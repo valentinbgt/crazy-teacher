@@ -7,6 +7,9 @@ public class Slotmachine : MonoBehaviour
     [SerializeField] private Wheel wheel1;
     [SerializeField] private Wheel wheel2;
     [SerializeField] private Wheel wheel3;
+    [SerializeField] private WheelFrame wheelFrame1;
+    [SerializeField] private WheelFrame wheelFrame2;
+    [SerializeField] private WheelFrame wheelFrame3;
 
     private int level = -1;
 
