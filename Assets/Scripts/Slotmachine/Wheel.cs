@@ -34,14 +34,12 @@ public class Wheel : MonoBehaviour
         }
 
 
-        var index = -spaceBetweenObjects * 3;
         var prefabIndex = 0;
         foreach (GameObject prefab in slotPrefabs)
         {
             GameObject instance = Instantiate(prefab, wheel.transform);
             // Position the instance based on the index
-            instance.transform.localPosition = new Vector3(0, index, 0);
-            index += spaceBetweenObjects;
+            instance.transform.localPosition = new Vector3(0, -100, 0);
 
             instantiatedObjects[prefabIndex] = instance;
             prefabIndex++;
