@@ -14,6 +14,30 @@ public class Wheel : MonoBehaviour
     //spin index, random float between 0 and spaceBetweenObjects
     private float spinIndex;
     private int numObjects;
+    private int offsetMargin = 3;
+
+    private bool isSpinning = true;
+
+    public bool Stop()
+    {
+        isSpinning = false;
+        //find the object nearest with the Y position nearest to 0 in instantiatedObjects
+        //devide spinIndex by two then round to the ciel the value
+        int nearestIndex = Mathf.RoundToInt(spinIndex / spaceBetweenObjects) % numObjects - offsetMargin - 1;
+        if (nearestIndex < 0) nearestIndex += numObjects;
+        string nearestObjectName = instantiatedObjects[nearestIndex].name;
+
+        if (nearestObjectName == "Seven")
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public void StartSpin()
+    {
+        isSpinning = true;
+    }
 
     void Awake()
     {
@@ -40,6 +64,8 @@ public class Wheel : MonoBehaviour
             GameObject instance = Instantiate(prefab, wheel.transform);
             // Position the instance based on the index
             instance.transform.localPosition = new Vector3(0, -100, 0);
+            //change name of the instance to the name of the prefab
+            instance.name = prefab.name;
 
             instantiatedObjects[prefabIndex] = instance;
             prefabIndex++;
@@ -50,11 +76,12 @@ public class Wheel : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (!isSpinning) return;
         numObjects = instantiatedObjects.Length;
 
         float spacing = spaceBetweenObjects;
         float totalHeight = numObjects * spacing;
-        float minY = -3f * spacing;     // your chosen start offset
+        float minY = -offsetMargin * spacing;     // your chosen start offset
 
         // advance the scroll (positive = move down visually; flip sign if you want the other way)
         spinIndex = Mathf.Repeat(spinIndex + spinSpeed * Time.deltaTime, totalHeight);
@@ -67,5 +94,6 @@ public class Wheel : MonoBehaviour
             instantiatedObjects[i].transform.localPosition = new Vector3(0f, y, 0f);
             loop += spacing;
         }
+
     }
 }
