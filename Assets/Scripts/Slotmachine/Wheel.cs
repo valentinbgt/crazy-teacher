@@ -50,14 +50,14 @@ public class Wheel : MonoBehaviour
     void FixedUpdate()
     {
         var loop = -spaceBetweenObjects * 3;
-        spinIndex += spinSpeed;
+        spinIndex -= spinSpeed;
         numObjects = instantiatedObjects.Length;
 
         foreach (GameObject element in instantiatedObjects)
         {
             float yPosition = spinIndex + loop;
 
-            if (yPosition >= (numObjects - 3) * spaceBetweenObjects)
+            if (yPosition < -((numObjects - 3) * spaceBetweenObjects))
             {
                 yPosition += numObjects * spaceBetweenObjects;
             }
