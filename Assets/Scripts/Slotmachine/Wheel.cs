@@ -9,13 +9,16 @@ public class Wheel : MonoBehaviour
     private GameObject wheel;
     private GameObject[] instantiatedObjects;
     private float spaceBetweenObjects = 2f;
-    private float spinSpeed = 0.05f;
-    private float spinIndex = 0f;
+    private float spinSpeed = 8f;
+
+    //spin index, random float between 0 and spaceBetweenObjects
+    private float spinIndex;
     private int numObjects;
 
     void Awake()
     {
         wheel = gameObject;
+        spinIndex = Random.Range(0f, spaceBetweenObjects);
     }
 
     // Start is called before the first frame update
@@ -24,10 +27,10 @@ public class Wheel : MonoBehaviour
         instantiatedObjects = new GameObject[slotPrefabs.Length];
 
         //shuffle the slotPrefabs array
-        for (int i = 0; i < slotPrefabs.Length; i++)
+        for (int i = 0; i < slotPrefabs.Length - 1; i++)
         {
-            int randomIndex = Random.Range(0, slotPrefabs.Length);
-            (slotPrefabs[randomIndex], slotPrefabs[i]) = (slotPrefabs[i], slotPrefabs[randomIndex]);
+            int j = Random.Range(i, slotPrefabs.Length);
+            (slotPrefabs[i], slotPrefabs[j]) = (slotPrefabs[j], slotPrefabs[i]);
         }
 
 
@@ -49,21 +52,22 @@ public class Wheel : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        var loop = -spaceBetweenObjects * 3;
-        spinIndex -= spinSpeed;
         numObjects = instantiatedObjects.Length;
 
-        foreach (GameObject element in instantiatedObjects)
+        float spacing = spaceBetweenObjects;
+        float totalHeight = numObjects * spacing;
+        float minY = -3f * spacing;     // your chosen start offset
+
+        // advance the scroll (positive = move down visually; flip sign if you want the other way)
+        spinIndex = Mathf.Repeat(spinIndex + spinSpeed * Time.deltaTime, totalHeight);
+
+        float loop = 0f;
+        for (int i = 0; i < numObjects; i++)
         {
-            float yPosition = spinIndex + loop;
-
-            if (yPosition < -((numObjects - 3) * spaceBetweenObjects))
-            {
-                yPosition += numObjects * spaceBetweenObjects;
-            }
-
-            element.transform.localPosition = new Vector3(0, yPosition, 0);
-            loop += spaceBetweenObjects;
+            // Wrap each item within [minY, minY + totalHeight)
+            float y = minY + Mathf.Repeat(loop - spinIndex, totalHeight);
+            instantiatedObjects[i].transform.localPosition = new Vector3(0f, y, 0f);
+            loop += spacing;
         }
     }
 }
