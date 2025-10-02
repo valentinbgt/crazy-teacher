@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
         RoundsPlayed = 0;
     }
 
-    void NextRound()
+    public void AddRound()
     {
         RoundsPlayed++;
         //ON POURRA RAJOUTER D'AUTRES ACTIONS AU CHANGEMENT DE ROUND ICI
