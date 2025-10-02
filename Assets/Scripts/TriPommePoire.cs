@@ -45,7 +45,7 @@ public class TriPommePoire : MonoBehaviour
             Debug.Log("Temps écoulé, fruit manqué");
             if (hasFailed == false)
             {
-                gameManager.lives--;
+                gameManager.LoseLife();
                 hasFailed = true;
             }
 
