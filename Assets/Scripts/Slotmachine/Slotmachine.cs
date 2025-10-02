@@ -12,6 +12,7 @@ public class Slotmachine : MonoBehaviour
     [SerializeField] private WheelFrame wheelFrame3;
 
     private int level = -1;
+    private bool btnDownLastUpdate = false;
 
     // Start is called before the first frame update
     void Start()
@@ -34,6 +35,8 @@ public class Slotmachine : MonoBehaviour
 
         if (Input.GetButton("P1_B1"))
         {
+            if (btnDownLastUpdate) return;
+            btnDownLastUpdate = true;
             if (level == 0)
             {
                 //start all the wheels spinning again
@@ -84,6 +87,10 @@ public class Slotmachine : MonoBehaviour
                     level = 0;
                 }
             }
+        }
+        else
+        {
+            btnDownLastUpdate = false;
         }
     }
 }
