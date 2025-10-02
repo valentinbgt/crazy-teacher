@@ -32,7 +32,7 @@ public class Slotmachine : MonoBehaviour
             level = 0;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetButton("P1_B1"))
         {
             if (level == 0)
             {
