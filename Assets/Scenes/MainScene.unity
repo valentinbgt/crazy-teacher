@@ -537,6 +537,7 @@ GameObject:
   m_Component:
   - component: {fileID: 799674789}
   - component: {fileID: 799674790}
+  - component: {fileID: 799674791}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -581,6 +582,18 @@ MonoBehaviour:
   timerUI: {fileID: 1846265154}
   livesUI: {fileID: 61360398}
   livesText: {fileID: 2130141365}
+--- !u!114 &799674791
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 799674788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e677d357653e41c4bb7511be04537a94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1042231888
 GameObject:
   m_ObjectHideFlags: 0
