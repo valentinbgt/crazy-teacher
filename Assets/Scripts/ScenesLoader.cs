@@ -1,36 +1,94 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class ScenesLoader : MonoBehaviour
 {
-    private string[] scenesList = [
+    // [SerializeField] private GameObject sceneContainer;
+    public GameObject sceneContainer; // Ton GameObject vide
+    public Vector3 targetScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+    private bool SceneLoaded = false;
+
+    private string[] scenesList = {
         "SlotMachine",
         "BallDropper",
         "TriPommePoire"
-    ];
-    private string loadingScene = "LoadingScene";
+    };
 
-    public void LoadMiniGame(string sceneName)
+    public void LoadMiniGame()
     {
-        Debug.Log("Trying to load " + sceneName);
-        SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
+        StartCoroutine(LoadMiniGameCoroutine());
     }
 
-    public void UnloadMiniGame(string sceneName)
+    IEnumerator LoadMiniGameCoroutine()
     {
-        SceneManager.UnloadSceneAsync(sceneName);
+        // Charge la scène additive
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("SlotMachine", LoadSceneMode.Additive);
+        while (!asyncLoad.isDone)
+            yield return null;
+
+        // Récupère la scène
+        Scene miniScene = SceneManager.GetSceneByName("SlotMachine");
+
+        // Parent tous les objets racines au container
+        foreach (GameObject go in miniScene.GetRootGameObjects())
+        {
+            go.transform.SetParent(sceneContainer.transform, false);
+        }
+        // Met à l'échelle le container
+        sceneContainer.transform.localScale = targetScale;
     }
 
-    public void NextMiniGameStep()
+    public void UnloadMiniGame()
     {
-
+        SceneManager.UnloadSceneAsync("SlotMachine");
     }
 
     void Update()
     {
-        if (Input.GetButton("P1_B6"))
+        if (Input.GetButton("P1_B6") && !SceneLoaded)
         {
-            LoadMiniGame("SlotMachine");
+            Debug.Log("Trying to load scene");
+            LoadMiniGame();
+            SceneLoaded = true;
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // public void LoadMiniGame(string sceneName)
+    // {
+    //     Debug.Log("Trying to load " + sceneName);
+    //     SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
+    // }
+
+    // public void UnloadMiniGame(string sceneName)
+    // {
+    //     SceneManager.UnloadSceneAsync(sceneName);
+    // }
+
+    // public void NextMiniGameStep()
+    // {
+    // }
+
+    // void Update()
+    // {
+    //     if (Input.GetButton("P1_B6"))
+    //     {
+    //         LoadMiniGame("SlotMachine");
+    //     }
+    // }
 }
