@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -46,6 +47,16 @@ public class GameManager : MonoBehaviour
     private float quitTimer = 0f;
     private readonly float timeBeforeQuit = 2f;
     private bool quit = false;
+
+    [DllImport("__Internal")]
+    private static extern void BackToMenu();
+
+    // Now you can call BackToMenu() in your methods
+    public void GoBackToMenu()
+    {
+        BackToMenu();
+        //Application.Quit();
+    }
     //[END] Back to menu manager
 
     public void getRandomGame()
@@ -205,7 +216,6 @@ public class GameManager : MonoBehaviour
         if (afkTimer < timeBeforeKick)
         {
             afkTimer += Time.fixedDeltaTime;
-            Debug.Log("afkTimer is : " + afkTimer);
         }
         else
         {
@@ -227,8 +237,8 @@ public class GameManager : MonoBehaviour
 
         if (quitTimer >= timeBeforeQuit)
         {
-            //ASK API TO QUIT
-            Debug.Log("QUITTING (TBD)");
+            Debug.Log("QUITTING...");
+            GoBackToMenu();
         }
         //[END] Back to menu manager
     }
