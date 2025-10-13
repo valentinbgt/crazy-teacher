@@ -41,6 +41,11 @@ public class GameManager : MonoBehaviour
         Lives = startingLives;
         livesUI?.SetLives(Lives);
         RoundsPlayed = 0;
+        if (livesText != null)
+        {
+            livesText.text = "Vies: " + Lives;
+        }
+        Debug.Log($"[GameManager] Awake - Lives={Lives}, Difficulty={difficulty}");
     }
 
     public void AddRound()
@@ -53,13 +58,24 @@ public class GameManager : MonoBehaviour
     public void LoseLife()
     {
         Lives--;
+        Debug.Log($"[GameManager] LoseLife called - Lives now {Lives}, livesUI={(livesUI!=null)}, livesText={(livesText!=null)}");
         livesUI?.SetLives(Lives);
+        if (livesText != null)
+        {
+            livesText.text = "Vies: " + Lives;
+            Debug.Log($"[GameManager] Updated livesText to: {livesText.text}");
+        }
+        Debug.Log($"[GameManager] LoseLife -> {Lives} left");
     }
 
     public void ResetLives()
     {
         Lives = startingLives;
         livesUI?.SetLives(Lives);
+        if (livesText != null)
+        {
+            livesText.text = "Vies: " + Lives;
+        }
     }
 
     //GESTION DU TIMER
@@ -71,6 +87,7 @@ public class GameManager : MonoBehaviour
         TimerRunning = true;
         timerUI?.Show(Duration);
         _timerCo = StartCoroutine(CoTimer());
+        Debug.Log($"[GameManager] StartTimer {Duration}s");
     }
 
     public void StopTimer()
@@ -79,6 +96,7 @@ public class GameManager : MonoBehaviour
         _timerCo = null;
         TimerRunning = false;
         timerUI?.Hide();
+        Debug.Log("[GameManager] StopTimer");
     }
 
     IEnumerator CoTimer()
@@ -93,6 +111,7 @@ public class GameManager : MonoBehaviour
         }
         TimerRunning = false;
         OnTimerEnded?.Invoke();
+        Debug.Log("[GameManager] Timer ended event fired");
     }
 
     //ACTIONS QUI SE LANCENT QUAND ON GAGNE OU PERD UN MINI-JEU
@@ -100,12 +119,14 @@ public class GameManager : MonoBehaviour
     {
         StopTimer();
         OnMinigameWon?.Invoke();
+        Debug.Log("[GameManager] Minigame WON");
     }
 
     public void NotifyFail()
     {
         StopTimer();
         OnMinigameFailed?.Invoke();
+        Debug.Log("[GameManager] Minigame FAILED");
     }
 
     //TOUT CE QUI EST EN DESSOUS : NE PAS UTILISER - A REFACTORER SUR MON MINI-JEU
@@ -113,6 +134,9 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        livesText.text = "Vies: " + lives;
+        if (livesText != null)
+        {
+            livesText.text = "Vies: " + Lives;
+        }
     }
 }
