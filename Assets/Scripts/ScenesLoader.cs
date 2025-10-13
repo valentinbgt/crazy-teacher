@@ -6,7 +6,7 @@ public class ScenesLoader : MonoBehaviour
 {
     // [SerializeField] private GameObject sceneContainer;
     public GameObject sceneContainer; // Ton GameObject vide
-    public Vector3 targetScale = new Vector3(0.5f, 0.5f, 0.5f);
+    public Vector3 targetScale = new Vector3(0.5f, 0.5f, 1f);
 
     private bool SceneLoaded = false;
 
@@ -19,6 +19,7 @@ public class ScenesLoader : MonoBehaviour
     public void LoadMiniGame()
     {
         StartCoroutine(LoadMiniGameCoroutine());
+        StartCoroutine(SceneScalerSleeper());
     }
 
     IEnumerator LoadMiniGameCoroutine()
@@ -34,15 +35,21 @@ public class ScenesLoader : MonoBehaviour
         // Parent tous les objets racines au container
         foreach (GameObject go in miniScene.GetRootGameObjects())
         {
+            if(go.name == "Main Camera") continue; // Ignore la caméra principale
             go.transform.SetParent(sceneContainer.transform, false);
         }
-        // Met à l'échelle le container
-        sceneContainer.transform.localScale = targetScale;
     }
 
     public void UnloadMiniGame()
     {
         SceneManager.UnloadSceneAsync("SlotMachine");
+    }
+    
+    IEnumerator SceneScalerSleeper()
+    {
+        yield return new WaitForSeconds(2f);
+        sceneContainer.transform.localScale = new Vector3(0.5f, 0.5f, 1f);
+        // sceneContainer.transform.localPosition = new Vector3(0f, -1.5f, 0f);
     }
 
     void Update()
