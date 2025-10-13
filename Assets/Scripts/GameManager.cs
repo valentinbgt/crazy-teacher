@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using System;
@@ -36,6 +37,7 @@ public class GameManager : MonoBehaviour
     public event Action OnMinigameWon;
     public event Action OnMinigameFailed;
     private ScenesLoader scenesLoader;
+    private AudioListener _activeAudioListener;
 
     // Back to menu manager
     private float afkTimer = 0f;
@@ -60,7 +62,19 @@ public class GameManager : MonoBehaviour
         Lives = startingLives;
         livesUI?.SetLives(Lives);
         RoundsPlayed = 0;
+        EnsureSingleAudioListener();
         getRandomGame();
+    }
+
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += HandleSceneLoaded;
+        EnsureSingleAudioListener();
+    }
+
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= HandleSceneLoaded;
     }
 
     public void AddRound()
@@ -133,6 +147,11 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        if (!HasExactlyOneActiveAudioListener())
+        {
+            EnsureSingleAudioListener();
+        }
+
         livesText.text = "Vies: " + lives;
 
         // Back to menu manager
@@ -157,5 +176,99 @@ public class GameManager : MonoBehaviour
             Debug.Log("You will be kicked");
         }
         //[END] Back to menu manager
+    }
+
+    private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        EnsureSingleAudioListener();
+    }
+
+    private void EnsureSingleAudioListener()
+    {
+        var listeners = FindObjectsOfType<AudioListener>();
+        AudioListener primary = null;
+
+        for (int i = 0; i < listeners.Length; i++)
+        {
+            var listener = listeners[i];
+            if (listener == null) continue;
+
+            if (listener.isActiveAndEnabled)
+            {
+                if (primary == null)
+                {
+                    primary = listener;
+                    continue;
+                }
+
+                listener.enabled = false;
+                continue;
+            }
+
+            if (primary == null)
+            {
+                primary = listener;
+                if (!primary.enabled) primary.enabled = true;
+                continue;
+            }
+
+            listener.enabled = false;
+        }
+
+        if (primary == null)
+        {
+            primary = AttachListenerToMainCamera();
+        }
+
+        if (primary == null)
+        {
+            primary = GetComponent<AudioListener>() ?? gameObject.AddComponent<AudioListener>();
+            primary.enabled = true;
+        }
+
+        if (!primary.enabled)
+        {
+            primary.enabled = true;
+        }
+
+        _activeAudioListener = primary;
+    }
+
+    private AudioListener AttachListenerToMainCamera()
+    {
+        var mainCamera = Camera.main;
+        if (mainCamera == null) return null;
+
+        var listener = mainCamera.GetComponent<AudioListener>();
+        if (listener == null)
+        {
+            listener = mainCamera.gameObject.AddComponent<AudioListener>();
+        }
+
+        listener.enabled = true;
+        return listener;
+    }
+
+    private bool HasExactlyOneActiveAudioListener()
+    {
+        var listeners = FindObjectsOfType<AudioListener>();
+        int activeCount = 0;
+
+        for (int i = 0; i < listeners.Length; i++)
+        {
+            var listener = listeners[i];
+            if (listener == null) continue;
+
+            if (listener.enabled && listener.gameObject.activeInHierarchy)
+            {
+                activeCount++;
+                if (activeCount > 1)
+                {
+                    return false;
+                }
+            }
+        }
+
+        return activeCount == 1;
     }
 }
