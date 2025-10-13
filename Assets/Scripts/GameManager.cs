@@ -41,7 +41,11 @@ public class GameManager : MonoBehaviour
 
     // Back to menu manager
     private float afkTimer = 0f;
-    private readonly float timeBeforeKick = 200f; //seconds
+    private readonly float timeBeforeKick = 10f; //seconds
+    private bool afk = false;
+    private float quitTimer = 0f;
+    private readonly float timeBeforeQuit = 2f;
+    private bool quit = false;
     //[END] Back to menu manager
 
     public void getRandomGame()
@@ -155,10 +159,42 @@ public class GameManager : MonoBehaviour
         livesText.text = "Vies: " + lives;
 
         // Back to menu manager
-        if (Input.GetButton("P1_B1"))
+        if (Input.GetButton("P1_Vertical") ||
+            Input.GetButton("P1_Horizontal") ||
+            Input.GetButton("P2_Vertical") ||
+            Input.GetButton("P2_Horizontal") ||
+            Input.GetButton("P1_Start") ||
+            Input.GetButton("P1_B1") ||
+            Input.GetButton("P1_B2") ||
+            Input.GetButton("P1_B3") ||
+            Input.GetButton("P1_B4") ||
+            Input.GetButton("P1_B5") ||
+            Input.GetButton("P1_B6") ||
+            Input.GetButton("P2_Start") ||
+            Input.GetButton("P2_B1") ||
+            Input.GetButton("P2_B2") ||
+            Input.GetButton("P2_B3") ||
+            Input.GetButton("P2_B4") ||
+            Input.GetButton("P2_B5") ||
+            Input.GetButton("P2_B6") ||
+            Input.GetButton("Coin"))
         {
             afkTimer = 0f;
-            Debug.Log("afkTimer reset.");
+        }
+
+        if (afkTimer < timeBeforeKick)
+        {
+            afk = false;
+        }
+
+        if (afk || Input.GetButton("Coin"))
+        {
+            quit = true;
+        }
+        else
+        {
+            quit = false;
+            quitTimer = 0f;
         }
         //[END] Back to menu manager
     }
@@ -166,14 +202,33 @@ public class GameManager : MonoBehaviour
     void FixedUpdate()
     {
         // Back to menu manager
-        afkTimer += Time.fixedDeltaTime;
-        Debug.Log("afkTimer is : " + afkTimer);
-        Debug.Log("Time.fixedDeltaTime is : " + Time.fixedDeltaTime);
-
-
-        if (afkTimer >= timeBeforeKick)
+        if (afkTimer < timeBeforeKick)
         {
-            Debug.Log("You will be kicked");
+            afkTimer += Time.fixedDeltaTime;
+            Debug.Log("afkTimer is : " + afkTimer);
+        }
+        else
+        {
+            if (!afk)
+            {
+                Debug.Log("You will be kicked in 2 seconds");
+                afk = true;
+            }
+        }
+
+        if (quit)
+        {
+            quitTimer += Time.fixedDeltaTime;
+        }
+        else
+        {
+            quitTimer = 0f;
+        }
+
+        if (quitTimer >= timeBeforeQuit)
+        {
+            //ASK API TO QUIT
+            Debug.Log("QUITTING (TBD)");
         }
         //[END] Back to menu manager
     }
