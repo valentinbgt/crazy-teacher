@@ -35,7 +35,11 @@ public class ScenesLoader : MonoBehaviour
         // Parent tous les objets racines au container
         foreach (GameObject go in miniScene.GetRootGameObjects())
         {
-            if(go.name == "Main Camera") continue; // Ignore la caméra principale
+            if(go.name == "Main Camera")
+            {
+                Destroy(go);
+                continue;
+            }; // Ignore la caméra principale
             go.transform.SetParent(sceneContainer.transform, false);
         }
     }
