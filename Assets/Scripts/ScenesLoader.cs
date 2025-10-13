@@ -19,7 +19,6 @@ public class ScenesLoader : MonoBehaviour
     public void LoadMiniGame()
     {
         StartCoroutine(LoadMiniGameCoroutine());
-        StartCoroutine(SceneScalerSleeper());
     }
 
     IEnumerator LoadMiniGameCoroutine()
@@ -35,25 +34,20 @@ public class ScenesLoader : MonoBehaviour
         // Parent tous les objets racines au container
         foreach (GameObject go in miniScene.GetRootGameObjects())
         {
-            if(go.name == "Main Camera")
+            if (go.name == "Main Camera")
             {
                 Destroy(go);
                 continue;
-            }; // Ignore la caméra principale
+            }
+            ; // Ignore la caméra principale
             go.transform.SetParent(sceneContainer.transform, false);
         }
+        sceneContainer.transform.localScale = new Vector3(0.5f, 0.5f, 1f);
     }
 
     public void UnloadMiniGame()
     {
         SceneManager.UnloadSceneAsync("SlotMachine");
-    }
-    
-    IEnumerator SceneScalerSleeper()
-    {
-        yield return new WaitForSeconds(2f);
-        sceneContainer.transform.localScale = new Vector3(0.5f, 0.5f, 1f);
-        // sceneContainer.transform.localPosition = new Vector3(0f, -1.5f, 0f);
     }
 
     void Update()
