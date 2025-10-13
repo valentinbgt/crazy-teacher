@@ -1,0 +1,148 @@
+using System.Collections;
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+
+public class CalculUIManager : MonoBehaviour
+{
+    [Header("UI")]
+    [SerializeField] private TMP_Text questionText; // calculation-value
+    [SerializeField] private TMP_Text propositionsText; // proposition-value (single TMP to list 3 choices)
+    [SerializeField] private Image successImage; // SucessImage
+    [SerializeField] private Image failImage;    // FailImage
+
+    private MiniGame_CalculManager calculManager;
+    private CalculLogic.CalculationData currentCalculation;
+    private bool awaitingAnswer;
+
+    void Awake()
+    {
+        calculManager = FindObjectOfType<MiniGame_CalculManager>();
+        if (questionText == null)
+        {
+            // Try to find by known name
+            var q = GameObject.Find("calculation-value");
+            if (q != null) questionText = q.GetComponent<TMP_Text>();
+        }
+        if (propositionsText == null)
+        {
+            var p = GameObject.Find("proposition-value");
+            if (p != null) propositionsText = p.GetComponent<TMP_Text>();
+        }
+        if (successImage == null)
+        {
+            var s = GameObject.Find("SucessImage");
+            if (s != null) successImage = s.GetComponent<Image>();
+        }
+        if (failImage == null)
+        {
+            var f = GameObject.Find("FailImage");
+            if (f != null) failImage = f.GetComponent<Image>();
+        }
+        Debug.Log("[CalculUI] Awake - wired refs: " +
+                  $"Q={(questionText!=null)}, P={(propositionsText!=null)}, S={(successImage!=null)}, F={(failImage!=null)}");
+        if (successImage != null) successImage.enabled = false;
+        if (failImage != null) failImage.enabled = false;
+    }
+
+    void Start()
+    {
+        Debug.Log("[CalculUI] Start - refs: " +
+                  $"Mgr={(calculManager!=null)}, Q={(questionText!=null)}, P={(propositionsText!=null)}, S={(successImage!=null)}, F={(failImage!=null)}");
+    }
+
+    public void DisplayCalculation(CalculLogic.CalculationData data)
+    {
+        currentCalculation = data;
+        if (questionText != null) questionText.text = data.Question;
+        if (propositionsText != null)
+        {
+            // Display three choices horizontally with spacing
+            var a0 = data.Answers.Count > 0 ? data.Answers[0].ToString() : "";
+            var a1 = data.Answers.Count > 1 ? data.Answers[1].ToString() : "";
+            var a2 = data.Answers.Count > 2 ? data.Answers[2].ToString() : "";
+            propositionsText.text = $"1) {a0}     2) {a1}     3) {a2}";
+        }
+        Debug.Log($"[CalculUI] Display - Q='{data.Question}' | A='{string.Join(", ", data.Answers)}'");
+        if (successImage != null) successImage.enabled = false;
+        if (failImage != null) failImage.enabled = false;
+        awaitingAnswer = true;
+    }
+
+    void Update()
+    {
+        // Gestion des boutons P1_B1 / P1_B2 / P1_B3
+        if (Input.GetButtonDown("P1_B1") || Input.GetKeyDown(KeyCode.F))
+        {
+            Debug.Log("[CalculUI] Input -> P1_B1 / F");
+            CheckAnswer(0);
+        }
+        if (Input.GetButtonDown("P1_B2") || Input.GetKeyDown(KeyCode.G))
+        {
+            Debug.Log("[CalculUI] Input -> P1_B2 / G");
+            CheckAnswer(1);
+        }
+        if (Input.GetButtonDown("P1_B3") || Input.GetKeyDown(KeyCode.H))
+        {
+            Debug.Log("[CalculUI] Input -> P1_B3 / H");
+            CheckAnswer(2);
+        }
+    }
+
+    private void CheckAnswer(int index)
+    {
+        if (!awaitingAnswer)
+        {
+            Debug.Log("[CalculUI] Input ignored (awaiting next question)");
+            return;
+        }
+        
+        // Check if game is over
+        if (calculManager != null)
+        {
+            var gm = FindObjectOfType<GameManager>();
+            if (gm != null && gm.Lives <= 0)
+            {
+                Debug.Log("[CalculUI] Game over - no lives left, ignoring input");
+                return;
+            }
+        }
+        
+        awaitingAnswer = false;
+        if (calculManager == null)
+        {
+            calculManager = FindObjectOfType<MiniGame_CalculManager>();
+            if (calculManager == null)
+            {
+                Debug.LogError("[CalculUI] Cannot validate: MiniGame_CalculManager not found");
+                return;
+            }
+        }
+        var chosenValue = (currentCalculation.Answers != null && currentCalculation.Answers.Count > index)
+            ? currentCalculation.Answers[index]
+            : int.MinValue;
+        Debug.Log($"[CalculUI] Validate - pressed index {index} (value={chosenValue}) for '{currentCalculation.Question}'");
+        bool correct = calculManager.OnAnswerSelected(index);
+        if (successImage != null) successImage.enabled = correct;
+        if (failImage != null) failImage.enabled = !correct;
+
+        // Advance flow: on correct, immediately next calculation; on wrong, next generated by manager after life update
+        if (correct)
+        {
+            Invoke("Advance", 0.6f); // brief feedback pause
+        }
+        else
+        {
+            Invoke("Advance", 0.6f);
+        }
+    }
+
+    private void Advance()
+    {
+        if (successImage != null) successImage.enabled = false;
+        if (failImage != null) failImage.enabled = false;
+        calculManager.GenerateNewCalculation();
+        awaitingAnswer = true;
+    }
+
+}
