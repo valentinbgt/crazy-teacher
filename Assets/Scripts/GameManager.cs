@@ -35,12 +35,27 @@ public class GameManager : MonoBehaviour
     //ACTION À EFFECTUER À LA FIN D'UN MINI-JEU
     public event Action OnMinigameWon;
     public event Action OnMinigameFailed;
+    private ScenesLoader scenesLoader;
+
+    public void getRandomGame()
+    {
+        string[] scenesList = {
+        "SlotMachine",
+        "BallDropper",
+        "TriPommePoire",
+        };
+        System.Random rand = new System.Random();
+        int index = rand.Next(scenesList.Length);
+        scenesLoader.LoadMiniGame(scenesList[index]);
+    }
 
     void Awake()
     {
+        scenesLoader = GetComponent<ScenesLoader>();
         Lives = startingLives;
         livesUI?.SetLives(Lives);
         RoundsPlayed = 0;
+        getRandomGame();
     }
 
     public void AddRound()

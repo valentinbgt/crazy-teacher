@@ -16,15 +16,15 @@ public class ScenesLoader : MonoBehaviour
         "TriPommePoire"
     };
 
-    public void LoadMiniGame()
+    public void LoadMiniGame(string sceneName)
     {
-        StartCoroutine(LoadMiniGameCoroutine());
+        StartCoroutine(LoadMiniGameCoroutine(sceneName));
     }
 
-    IEnumerator LoadMiniGameCoroutine()
+    IEnumerator LoadMiniGameCoroutine(string sceneName)
     {
         // Charge la scène additive
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("SlotMachine", LoadSceneMode.Additive);
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
         while (!asyncLoad.isDone)
             yield return null;
 
@@ -45,19 +45,9 @@ public class ScenesLoader : MonoBehaviour
         sceneContainer.transform.localScale = new Vector3(0.5f, 0.5f, 1f);
     }
 
-    public void UnloadMiniGame()
+    public void UnloadMiniGame(string sceneName)
     {
-        SceneManager.UnloadSceneAsync("SlotMachine");
-    }
-
-    void Update()
-    {
-        if (Input.GetButton("P1_B6") && !SceneLoaded)
-        {
-            Debug.Log("Trying to load scene");
-            LoadMiniGame();
-            SceneLoaded = true;
-        }
+        SceneManager.UnloadSceneAsync(sceneName);
     }
 
 
