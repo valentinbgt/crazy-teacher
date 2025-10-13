@@ -37,6 +37,11 @@ public class GameManager : MonoBehaviour
     public event Action OnMinigameFailed;
     private ScenesLoader scenesLoader;
 
+    // Back to menu manager
+    private float afkTimer = 0f;
+    private readonly float timeBeforeKick = 200f; //seconds
+    //[END] Back to menu manager
+
     public void getRandomGame()
     {
         string[] scenesList = {
@@ -129,5 +134,28 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         livesText.text = "Vies: " + lives;
+
+        // Back to menu manager
+        if (Input.GetButton("P1_B1"))
+        {
+            afkTimer = 0f;
+            Debug.Log("afkTimer reset.");
+        }
+        //[END] Back to menu manager
+    }
+
+    void FixedUpdate()
+    {
+        // Back to menu manager
+        afkTimer += Time.fixedDeltaTime;
+        Debug.Log("afkTimer is : " + afkTimer);
+        Debug.Log("Time.fixedDeltaTime is : " + Time.fixedDeltaTime);
+
+
+        if (afkTimer >= timeBeforeKick)
+        {
+            Debug.Log("You will be kicked");
+        }
+        //[END] Back to menu manager
     }
 }
