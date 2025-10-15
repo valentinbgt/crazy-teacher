@@ -7,11 +7,20 @@ public class Platform : MonoBehaviour
     [Header("Rotation")]
     public float rotationSpeedDegreesPerSecond = 70f;
     public Vector3 localRotationAxis = Vector3.up;
+    public GameManager gameManager;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+
+    }
+    
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("ball"))
+        {
+            gameManager.LoseLife();
+        }
     }
 
     // Update is called once per frame
