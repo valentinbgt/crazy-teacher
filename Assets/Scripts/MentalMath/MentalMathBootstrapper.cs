@@ -4,6 +4,7 @@ using TMPro;
 
 public static class MentalMathBootstrapper
 {
+	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 	private static void EnsureMentalMathHUD()
 	{
 		var canvas = Object.FindObjectOfType<Canvas>();

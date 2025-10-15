@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class TriPommePoire : MonoBehaviour
 {
@@ -20,18 +21,26 @@ public class TriPommePoire : MonoBehaviour
     private GameObject lastSpawnedFruit;
 
     public float timerDuration = 5f;
+    public float timer;
+    public Image timerBar;
 
     private bool hasFailed = false;
 
     void Start()
     {
         SpawnRandomFruit(Vector3.zero);
-        gameManager.StartTimer(timerDuration);
+        timer = timerDuration;
+        timerBar.fillAmount = 1f;
     }
 
     void Update()
     {
-        if (gameManager.RemainingTime <= 0f && fruitsATrouver > 0)
+        if (timer > 0f && fruitsATrouver > 0)
+        {
+            timer -= Time.deltaTime;
+            timerBar.fillAmount = timer / timerDuration;
+        }
+        else if (timer <= 0f && fruitsATrouver > 0)
         {
             Debug.Log("Temps écoulé, fruit manqué");
             if (hasFailed == false)
@@ -43,7 +52,7 @@ public class TriPommePoire : MonoBehaviour
         }
         
         fruitsATrouverText.text = "Fruits à trier: " + fruitsATrouver;
-        if (fruitsATrouver > 0 && gameManager.RemainingTime > 0f)
+        if (fruitsATrouver > 0)
         {
             if (Input.GetButtonDown("P1_B1"))
             {
