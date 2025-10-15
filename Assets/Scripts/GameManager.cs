@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using System.IO;
 
 public class GameManager : MonoBehaviour
 {
@@ -35,9 +36,33 @@ public class GameManager : MonoBehaviour
     //ACTION À EFFECTUER À LA FIN D'UN MINI-JEU
     public event Action OnMinigameWon;
     public event Action OnMinigameFailed;
+    private ScenesLoader scenesLoader;
+
+    private string currentGame = "";
+
+    // public void getRandomGame()
+    // {
+    //     string[] scenesList = Directory.GetFiles("Assets/Scenes/MiniGames", "*.unity");
+    //     for (int i = 0; i < scenesList.Length; i++)
+    //     {
+    //         scenesList[i] = Path.GetFileNameWithoutExtension(scenesList[i]);
+    //     }
+    //     System.Random rand = new System.Random();
+    //     int index = rand.Next(scenesList.Length);
+    //     if (currentGame == scenesList[index])
+    //     {
+    //         index = (index + 1) % scenesList.Length;
+    //     }
+    //     if (Input.GetButton("P1_B6"))
+    //     {   
+    //         scenesLoader.LoadMiniGame(scenesList[index]);
+    //     }
+    //     currentGame = scenesList[index];
+    // }
 
     void Awake()
     {
+        scenesLoader = GetComponent<ScenesLoader>();
         Lives = startingLives;
         livesUI?.SetLives(Lives);
         RoundsPlayed = 0;
@@ -134,9 +159,38 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (livesText != null)
+        livesText.text = "Vies: " + lives;
+        if (Input.GetButtonDown("P1_B6"))
         {
-            livesText.text = "Vies: " + Lives;
+            string nextGame = GetRandomGame(); //ou alors le jeu que vous voulez tester comme ça : nextGame = "SlotMachine";
+            scenesLoader.LoadMiniGame(nextGame);
+            currentGame = nextGame;
         }
+        if (Input.GetButtonDown("P1_B3"))
+        {
+            if (currentGame != "")
+            {
+                scenesLoader.UnloadMiniGame(currentGame);
+            }
+        }
+    }
+
+    private string GetRandomGame()
+    {
+        string[] scenesList = Directory.GetFiles("Assets/Scenes/MiniGames", "*.unity");
+        for (int i = 0; i < scenesList.Length; i++)
+        {
+            scenesList[i] = Path.GetFileNameWithoutExtension(scenesList[i]);
+        }
+
+        System.Random rand = new System.Random();
+        int index = rand.Next(scenesList.Length);
+
+        if (currentGame == scenesList[index])
+        {
+            index = (index + 1) % scenesList.Length;
+        }
+
+        return scenesList[index];
     }
 }
