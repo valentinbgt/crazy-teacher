@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using System;
@@ -39,26 +37,6 @@ public class GameManager : MonoBehaviour
     public event Action OnMinigameWon;
     public event Action OnMinigameFailed;
     private ScenesLoader scenesLoader;
-    private AudioListener _activeAudioListener;
-
-    // Back to menu manager
-    private float afkTimer = 0f;
-    private readonly float timeBeforeKick = 200f; //seconds
-    private bool afk = false;
-    private float quitTimer = 0f;
-    private readonly float timeBeforeQuit = 2f;
-    private bool quit = false;
-
-    [DllImport("__Internal")]
-    private static extern void BackToMenu();
-
-    // Now you can call BackToMenu() in your methods
-    public void GoBackToMenu()
-    {
-        BackToMenu();
-        //Application.Quit();
-    }
-    //[END] Back to menu manager
 
     private string currentGame = "";
 
@@ -93,19 +71,6 @@ public class GameManager : MonoBehaviour
             livesText.text = "Vies: " + Lives;
         }
         Debug.Log($"[GameManager] Awake - Lives={Lives}, Difficulty={difficulty}");
-
-        EnsureSingleAudioListener();
-    }
-
-    void OnEnable()
-    {
-        SceneManager.sceneLoaded += HandleSceneLoaded;
-        EnsureSingleAudioListener();
-    }
-
-    void OnDisable()
-    {
-        SceneManager.sceneLoaded -= HandleSceneLoaded;
     }
 
     public void AddRound()
@@ -118,7 +83,7 @@ public class GameManager : MonoBehaviour
     public void LoseLife()
     {
         Lives--;
-        Debug.Log($"[GameManager] LoseLife called - Lives now {Lives}, livesUI={(livesUI != null)}, livesText={(livesText != null)}");
+        Debug.Log($"[GameManager] LoseLife called - Lives now {Lives}, livesUI={(livesUI!=null)}");
         livesUI?.SetLives(Lives);
         if (livesText != null)
         {
@@ -213,46 +178,6 @@ public class GameManager : MonoBehaviour
                 scenesLoader.UnloadMiniGame(currentGame);
             }
         }
-
-        // Back to menu manager
-        if (Input.GetButton("P1_Vertical") ||
-            Input.GetButton("P1_Horizontal") ||
-            Input.GetButton("P2_Vertical") ||
-            Input.GetButton("P2_Horizontal") ||
-            Input.GetButton("P1_Start") ||
-            Input.GetButton("P1_B1") ||
-            Input.GetButton("P1_B2") ||
-            Input.GetButton("P1_B3") ||
-            Input.GetButton("P1_B4") ||
-            Input.GetButton("P1_B5") ||
-            Input.GetButton("P1_B6") ||
-            Input.GetButton("P2_Start") ||
-            Input.GetButton("P2_B1") ||
-            Input.GetButton("P2_B2") ||
-            Input.GetButton("P2_B3") ||
-            Input.GetButton("P2_B4") ||
-            Input.GetButton("P2_B5") ||
-            Input.GetButton("P2_B6") ||
-            Input.GetButton("Coin"))
-        {
-            afkTimer = 0f;
-        }
-
-        if (afkTimer < timeBeforeKick)
-        {
-            afk = false;
-        }
-
-        if (afk || Input.GetButton("Coin"))
-        {
-            quit = true;
-        }
-        else
-        {
-            quit = false;
-            quitTimer = 0f;
-        }
-        //[END] Back to menu manager
     }
 
     private string GetRandomGame()
@@ -272,133 +197,5 @@ public class GameManager : MonoBehaviour
         }
 
         return scenesList[index];
-
-    }
-
-    void FixedUpdate()
-    {
-        // Back to menu manager
-        if (afkTimer < timeBeforeKick)
-        {
-            afkTimer += Time.fixedDeltaTime;
-        }
-        else
-        {
-            if (!afk)
-            {
-                Debug.Log("You will be kicked in 2 seconds");
-                afk = true;
-            }
-        }
-
-        if (quit)
-        {
-            quitTimer += Time.fixedDeltaTime;
-        }
-        else
-        {
-            quitTimer = 0f;
-        }
-
-        if (quitTimer >= timeBeforeQuit)
-        {
-            Debug.Log("QUITTING...");
-            GoBackToMenu();
-        }
-        //[END] Back to menu manager
-    }
-
-    private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        EnsureSingleAudioListener();
-    }
-
-    private void EnsureSingleAudioListener()
-    {
-        var listeners = FindObjectsOfType<AudioListener>();
-        AudioListener primary = null;
-
-        for (int i = 0; i < listeners.Length; i++)
-        {
-            var listener = listeners[i];
-            if (listener == null) continue;
-
-            if (listener.isActiveAndEnabled)
-            {
-                if (primary == null)
-                {
-                    primary = listener;
-                    continue;
-                }
-
-                listener.enabled = false;
-                continue;
-            }
-
-            if (primary == null)
-            {
-                primary = listener;
-                if (!primary.enabled) primary.enabled = true;
-                continue;
-            }
-
-            listener.enabled = false;
-        }
-
-        if (primary == null)
-        {
-            primary = AttachListenerToMainCamera();
-        }
-
-        if (primary == null)
-        {
-            primary = GetComponent<AudioListener>() ?? gameObject.AddComponent<AudioListener>();
-            primary.enabled = true;
-        }
-
-        if (!primary.enabled)
-        {
-            primary.enabled = true;
-        }
-
-        _activeAudioListener = primary;
-    }
-
-    private AudioListener AttachListenerToMainCamera()
-    {
-        var mainCamera = Camera.main;
-        if (mainCamera == null) return null;
-
-        var listener = mainCamera.GetComponent<AudioListener>();
-        if (listener == null)
-        {
-            listener = mainCamera.gameObject.AddComponent<AudioListener>();
-        }
-
-        listener.enabled = true;
-        return listener;
-    }
-
-    private bool HasExactlyOneActiveAudioListener()
-    {
-        var listeners = FindObjectsOfType<AudioListener>();
-        int activeCount = 0;
-
-        for (int i = 0; i < listeners.Length; i++)
-        {
-            var listener = listeners[i];
-            if (listener == null) continue;
-
-            if (listener.enabled && listener.gameObject.activeInHierarchy)
-            {
-                activeCount++;
-                if (activeCount > 1)
-                {
-                    return false;
-                }
-            }
-        }
-
-        return activeCount == 1;
     }
 }
