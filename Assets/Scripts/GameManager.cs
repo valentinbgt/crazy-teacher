@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviour
 
     // Back to menu manager
     private float afkTimer = 0f;
-    private readonly float timeBeforeKick = 10f; //seconds
+    private readonly float timeBeforeKick = 200f; //seconds
     private bool afk = false;
     private float quitTimer = 0f;
     private readonly float timeBeforeQuit = 2f;
