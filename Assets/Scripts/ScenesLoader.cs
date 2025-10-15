@@ -29,7 +29,7 @@ public class ScenesLoader : MonoBehaviour
             yield return null;
 
         // Récupère la scène
-        Scene miniScene = SceneManager.GetSceneByName("SlotMachine");
+        Scene miniScene = SceneManager.GetSceneByName(sceneName);
 
         // Parent tous les objets racines au container
         foreach (GameObject go in miniScene.GetRootGameObjects())
@@ -48,42 +48,9 @@ public class ScenesLoader : MonoBehaviour
     public void UnloadMiniGame(string sceneName)
     {
         SceneManager.UnloadSceneAsync(sceneName);
+        foreach (Transform child in sceneContainer.transform)
+        {
+            Destroy(child.gameObject);
+        }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // public void LoadMiniGame(string sceneName)
-    // {
-    //     Debug.Log("Trying to load " + sceneName);
-    //     SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
-    // }
-
-    // public void UnloadMiniGame(string sceneName)
-    // {
-    //     SceneManager.UnloadSceneAsync(sceneName);
-    // }
-
-    // public void NextMiniGameStep()
-    // {
-    // }
-
-    // void Update()
-    // {
-    //     if (Input.GetButton("P1_B6"))
-    //     {
-    //         LoadMiniGame("SlotMachine");
-    //     }
-    // }
 }
