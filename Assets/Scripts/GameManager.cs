@@ -88,10 +88,6 @@ public class GameManager : MonoBehaviour
         Lives = startingLives;
         livesUI?.SetLives(Lives);
         RoundsPlayed = 0;
-        if (livesText != null)
-        {
-            livesText.text = "Vies: " + Lives;
-        }
         Debug.Log($"[GameManager] Awake - Lives={Lives}, Difficulty={difficulty}");
 
         EnsureSingleAudioListener();
@@ -118,13 +114,8 @@ public class GameManager : MonoBehaviour
     public void LoseLife()
     {
         Lives--;
-        Debug.Log($"[GameManager] LoseLife called - Lives now {Lives}, livesUI={(livesUI != null)}, livesText={(livesText != null)}");
+        Debug.Log($"[GameManager] LoseLife called - Lives now {Lives}, livesUI={(livesUI != null)}");
         livesUI?.SetLives(Lives);
-        if (livesText != null)
-        {
-            livesText.text = "Vies: " + Lives;
-            Debug.Log($"[GameManager] Updated livesText to: {livesText.text}");
-        }
         Debug.Log($"[GameManager] LoseLife -> {Lives} left");
     }
 
@@ -132,10 +123,6 @@ public class GameManager : MonoBehaviour
     {
         Lives = startingLives;
         livesUI?.SetLives(Lives);
-        if (livesText != null)
-        {
-            livesText.text = "Vies: " + Lives;
-        }
     }
 
     //GESTION DU TIMER
@@ -189,17 +176,13 @@ public class GameManager : MonoBehaviour
         Debug.Log("[GameManager] Minigame FAILED");
     }
 
-    //TOUT CE QUI EST EN DESSOUS : NE PAS UTILISER - A REFACTORER SUR MON MINI-JEU
-    public TMP_Text livesText;
-
     void Update()
     {
         if (!HasExactlyOneActiveAudioListener())
         {
             EnsureSingleAudioListener();
         }
-
-        livesText.text = "Vies: " + lives;
+        
         if (Input.GetButtonDown("P1_B6"))
         {
             string nextGame = GetRandomGame(); //ou alors le jeu que vous voulez tester comme ça : nextGame = "SlotMachine";
