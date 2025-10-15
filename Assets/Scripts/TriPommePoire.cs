@@ -23,6 +23,7 @@ public class TriPommePoire : MonoBehaviour
     public float timerDuration = 5f;
 
     private bool hasFailed = false;
+    private bool hasReturnedToCenter = true;
 
     void Start()
     {
@@ -32,7 +33,9 @@ public class TriPommePoire : MonoBehaviour
 
     void Update()
     {
-         if (gameManager.RemainingTime <= 0f && fruitsATrouver > 0)
+        float horizontalInput = Input.GetAxisRaw("P1_Horizontal");
+        // Gestion du timer et de l'échec
+        if (gameManager.RemainingTime <= 0f && fruitsATrouver > 0)
         {
             Debug.Log("Temps écoulé, fruit manqué");
             if (hasFailed == false)
@@ -40,32 +43,39 @@ public class TriPommePoire : MonoBehaviour
                 gameManager.LoseLife();
                 hasFailed = true;
             }
-
         }
-        
+
         fruitsATrouverText.text = "Fruits à trier: " + fruitsATrouver;
         if (fruitsATrouver > 0 && gameManager.RemainingTime > 0f)
         {
-            if (Input.GetButtonDown("P1_B1"))
+            // Si le joystick est revenu au centre, on autorise un nouvel input
+            if (Mathf.Abs(horizontalInput) < 0.2f)
+            {
+                hasReturnedToCenter = true;
+            }
+            // Si le joystick est à gauche et qu'on attend un fruit rouge
+            else if (horizontalInput < -0.5f && hasReturnedToCenter)
             {
                 if (currentFruitName == "red")
                 {
                     fruitsATrouver--;
-                    Debug.Log("Fruit correct");
+                    Debug.Log("Fruit correct (gauche)");
                     SpawnRandomFruit(Vector3.left);
                 }
+                hasReturnedToCenter = false;
             }
-            else if (Input.GetButtonDown("P1_B2"))
+            // Si le joystick est à droite et qu'on attend un fruit bleu
+            else if (horizontalInput > 0.5f && hasReturnedToCenter)
             {
                 if (currentFruitName == "blue")
                 {
                     fruitsATrouver--;
-                    Debug.Log("Fruit correct");
+                    Debug.Log("Fruit correct (droite)");
                     SpawnRandomFruit(Vector3.right);
                 }
+                hasReturnedToCenter = false;
             }
         }
-        
     }
 
     void SpawnRandomFruit(Vector3 moveDirection)
