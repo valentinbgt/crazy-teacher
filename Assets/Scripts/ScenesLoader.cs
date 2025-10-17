@@ -4,48 +4,69 @@ using System.Collections;
 
 public class ScenesLoader : MonoBehaviour
 {
-    // [SerializeField] private GameObject sceneContainer;
-    public GameObject sceneContainer; // Ton GameObject vide
-
-    private bool SceneLoaded = false;
-
-    private string[] scenesList = {
-        "SlotMachine",
-        "BallDropper",
-        "TriPommePoire"
-    };
+    public GameObject sceneContainer;
 
     public void LoadMiniGame(string sceneName)
     {
-        StartCoroutine(LoadMiniGameCoroutine(sceneName));
+        StartCoroutine(LoadMiniGameSequence(sceneName));
     }
 
-    IEnumerator LoadMiniGameCoroutine(string sceneName)
+    private IEnumerator LoadMiniGameSequence(string sceneName)
     {
-        // Charge la scène additive
+        // Étape 1 : Charger la scène de transition
+        yield return StartCoroutine(LoadTransitionSceneCoroutine("LoadingScene"));
+
+        // Étape 2 : Petite pause
+        yield return new WaitForSeconds(1f);
+
+        // Étape 3 : Décharger la scène de transition
+        yield return StartCoroutine(UnloadTransitionSceneCoroutine("LoadingScene"));
+
+        // Étape 5 : Charger la scène du mini-jeu
+        yield return StartCoroutine(LoadMiniGameCoroutine(sceneName));
+    }
+
+    private IEnumerator LoadTransitionSceneCoroutine(string sceneName)
+    {
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
         while (!asyncLoad.isDone)
             yield return null;
 
-        // Récupère la scène
-        Scene miniScene = SceneManager.GetSceneByName(sceneName);
+        Scene transitionScene = SceneManager.GetSceneByName(sceneName);
+        foreach (GameObject go in transitionScene.GetRootGameObjects())
+        {
+            go.transform.SetParent(sceneContainer.transform, false);
+        }
+    }
 
-        // Parent tous les objets racines au container
+    private IEnumerator UnloadTransitionSceneCoroutine(string sceneName)
+    {
+        AsyncOperation asyncUnload = SceneManager.UnloadSceneAsync(sceneName);
+        while (!asyncUnload.isDone)
+            yield return null;
+
+        foreach (Transform child in sceneContainer.transform)
+        {
+            Destroy(child.gameObject);
+        }
+    }
+
+    private IEnumerator LoadMiniGameCoroutine(string sceneName)
+    {
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+        while (!asyncLoad.isDone)
+            yield return null;
+
+        Scene miniScene = SceneManager.GetSceneByName(sceneName);
         foreach (GameObject go in miniScene.GetRootGameObjects())
         {
-            if (go.name == "Main Camera")
-            {
-                Destroy(go);
-                continue;
-            }
-            if (go.name == "EventSystem")
+            if (go.name == "Main Camera" || go.name == "EventSystem")
             {
                 Destroy(go);
                 continue;
             }
             go.transform.SetParent(sceneContainer.transform, false);
         }
-        // sceneContainer.transform.localScale = new Vector3(0.5f, 0.5f, 1f);
     }
 
     public void UnloadMiniGame(string sceneName)
