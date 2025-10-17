@@ -11,7 +11,7 @@ public class Slotmachine : MonoBehaviour
     [SerializeField] private WheelFrame wheelFrame2;
     [SerializeField] private WheelFrame wheelFrame3;
 
-    private int level = -1;
+    private int level = 1;
     private bool btnDownLastUpdate = false;
 
     // Start is called before the first frame update
