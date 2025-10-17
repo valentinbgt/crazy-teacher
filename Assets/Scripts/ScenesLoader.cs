@@ -6,7 +6,6 @@ public class ScenesLoader : MonoBehaviour
 {
     // [SerializeField] private GameObject sceneContainer;
     public GameObject sceneContainer; // Ton GameObject vide
-    public Vector3 targetScale = new Vector3(0.5f, 0.5f, 1f);
 
     private bool SceneLoaded = false;
 
@@ -39,10 +38,14 @@ public class ScenesLoader : MonoBehaviour
                 Destroy(go);
                 continue;
             }
-            ; // Ignore la caméra principale
+            if (go.name == "EventSystem")
+            {
+                Destroy(go);
+                continue;
+            }
             go.transform.SetParent(sceneContainer.transform, false);
         }
-        sceneContainer.transform.localScale = new Vector3(0.5f, 0.5f, 1f);
+        // sceneContainer.transform.localScale = new Vector3(0.5f, 0.5f, 1f);
     }
 
     public void UnloadMiniGame(string sceneName)

@@ -613,7 +613,6 @@ MonoBehaviour:
   roundsPlayed: 0
   timerUI: {fileID: 1846265154}
   livesUI: {fileID: 61360398}
-  livesText: {fileID: 2130141365}
 --- !u!114 &799674791
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -627,7 +626,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneContainer: {fileID: 788888054}
-  targetScale: {x: 0.5, y: 0.5, z: 0.5}
 --- !u!1 &1042231888
 GameObject:
   m_ObjectHideFlags: 0
@@ -965,10 +963,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SendPointerHoverToParent: 1
-  m_HorizontalAxis: Horizontal
-  m_VerticalAxis: Vertical
-  m_SubmitButton: Submit
-  m_CancelButton: Cancel
+  m_HorizontalAxis: P1_Horizontal
+  m_VerticalAxis: P1_Vertical
+  m_SubmitButton: P1_B1
+  m_CancelButton: P1_B2
   m_InputActionsPerSecond: 10
   m_RepeatDelay: 0.5
   m_ForceModuleActive: 0

@@ -20,6 +20,7 @@ public class Platform : MonoBehaviour
         if (other.gameObject.CompareTag("ball"))
         {
             gameManager.LoseLife();
+            Debug.Log("loose");
         }
     }
 
