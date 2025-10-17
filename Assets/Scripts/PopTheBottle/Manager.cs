@@ -5,6 +5,7 @@ using UnityEngine;
 public class Manager : MonoBehaviour
 {
     [SerializeField] private GameObject bottleObject;
+    private RectTransform bottleRectTransform;
 
     private GameManager gameManager;
 
@@ -20,7 +21,15 @@ public class Manager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        initializedBottleY = bottleObject.transform.position.y;
+        bottleRectTransform = bottleObject.GetComponent<RectTransform>();
+        if (bottleRectTransform != null)
+        {
+            initializedBottleY = bottleRectTransform.anchoredPosition.y;
+        }
+        else
+        {
+            initializedBottleY = bottleObject.transform.localPosition.y;
+        }
 
         // Find the GameManager in the scene
         gameManager = FindObjectOfType<GameManager>();
@@ -83,9 +92,20 @@ public class Manager : MonoBehaviour
         bottleOffsetY = bottleState;
 
         // Update bottle position
-        Vector3 bottlePosition = bottleObject.transform.position;
-        bottlePosition.y = initializedBottleY + bottleOffsetY;
-        bottleObject.transform.position = bottlePosition;
+        if (bottleRectTransform != null)
+        {
+            Vector2 anchoredPosition = bottleRectTransform.anchoredPosition;
+            anchoredPosition.y = initializedBottleY + bottleOffsetY;
+            bottleRectTransform.anchoredPosition = anchoredPosition;
+        }
+        else
+        {
+            Vector3 localPosition = bottleObject.transform.localPosition;
+            localPosition.y = initializedBottleY + bottleOffsetY;
+            bottleObject.transform.localPosition = localPosition;
+        }
+
+        Debug.Log("Bottle Position: " + bottleObject.transform.position);
 
         // Update bottle saturation
         //make the difference between last and current state
