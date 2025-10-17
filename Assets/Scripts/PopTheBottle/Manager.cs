@@ -28,6 +28,8 @@ public class Manager : MonoBehaviour
         {
             Debug.LogError("[Manager] No GameManager found in the scene!");
         }
+
+        gameManager.StartTimer(120);
     }
 
     // Update is called once per frame
@@ -92,11 +94,11 @@ public class Manager : MonoBehaviour
         {
             bottleSaturation += Mathf.Abs(bottleState - lastBottleState);
             lastBottleState = bottleState;
+            Debug.Log("Win Percentage: " + winPercentage + "%");
         }
 
         // Calculate win percentage
         winPercentage = (float)bottleSaturation / bottleSaturationMax * 100f;
-        Debug.Log("Win Percentage: " + winPercentage + "%");
     }
 
     // void FixedUpdate()
