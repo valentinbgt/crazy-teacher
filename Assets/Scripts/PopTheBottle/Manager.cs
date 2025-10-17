@@ -21,12 +21,22 @@ public class Manager : MonoBehaviour
     void Start()
     {
         initializedBottleY = bottleObject.transform.position.y;
+
+        // Find the GameManager in the scene
+        gameManager = FindObjectOfType<GameManager>();
+        if (gameManager == null)
+        {
+            Debug.LogError("[Manager] No GameManager found in the scene!");
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
         if (gameEnded) return;
+
+        // Guard against null gameManager
+        if (gameManager == null) return;
 
         // Check for game end
         if (bottleSaturation >= bottleSaturationMax)
